@@ -12,6 +12,7 @@ Parks - National parks from NPS boundary file - https://public-nps.opendata.arcg
 Local and regional parks from ESRI https://www.arcgis.com/home/item.html?id=578968f975774d3fab79fe56c8c90941
 
 Roads - Shapefile from BTS specifically the HPMS data, has problems with incomplete coverage in micro areas https://www.bts.gov/geography/geospatial-portal/NTAD-direct-download
+More info on data found here: https://www.fhwa.dot.gov/policyinformation/hpms/shapefiles.cfm
 
 EPA Smartlocation data - https://www.epa.gov/smartgrowth/smart-location-mapping
 
