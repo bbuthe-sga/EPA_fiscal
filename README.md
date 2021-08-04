@@ -11,7 +11,7 @@ Water bodies and inundated areas - USGS data, two files - NHDWaterbody and NHDAr
 Parks - National parks from NPS boundary file - https://public-nps.opendata.arcgis.com/datasets/nps::nps-boundary-1/about
 Local and regional parks from ESRI https://www.arcgis.com/home/item.html?id=578968f975774d3fab79fe56c8c90941
 
-Roads - Shapefile from BTS, has problems with incomplete coverage in micro areas https://www.bts.gov/geography/geospatial-portal/NTAD-direct-download
+Roads - Shapefile from BTS specifically the HPMS data, has problems with incomplete coverage in micro areas https://www.bts.gov/geography/geospatial-portal/NTAD-direct-download
 
 EPA Smartlocation data - https://www.epa.gov/smartgrowth/smart-location-mapping
 
