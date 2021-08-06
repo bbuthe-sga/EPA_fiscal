@@ -194,3 +194,10 @@ groups.
 - Tabulate estimates in `LOC_CELLS`
     - `road_area`
     - `infra_eff`
+
+
+### 7. Enrich dataset with other attributes
+- SLD attributes based on block groups in `CELLS_CBG`
+    - Area-based averaging
+    - Suitability-based averaging
+- CBSA-level attributes based cell column `CBSA`
