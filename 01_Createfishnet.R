@@ -29,7 +29,7 @@
     # List all feature classes in a file geodatabase
         st_layers(geodata)
     
-    
+    #CBSA with water and parks erased
     cbsa<-st_read(dsn = geodata, layer = "tl_2019_us_cbsa_albers") #This is all micro and metro areas
     
     cbsa_erased<-st_read(dsn = geodata, layer = "tl_2019_us_cbsa_albers_Erase_water_allparks")
@@ -42,6 +42,7 @@
     micro<-cbsa_erased%>%
       filter(MEMI == 2)
     
+#Call in trial data to complete fishnet code on
     names(cbsa)
     trial<-st_read(dsn = geodata, layer = "trial") #This is a single metro area in NV to use for example scripting
 
@@ -55,9 +56,9 @@
                  "NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN",
                  "TX","UT","VT","VA","WA","WV","WI","WY","DC")
     
-    msavars <- c(total_pop = "B01003_001", median_income = "B19013_001")
+    msavars <- c(total_pop = "B01003_001", median_income = "B19013_001") #put desired variables here
     
-    #Call in the data with the function get_acs
+    #Call in the data with the function get_acs - Trial data
     acs19_nv<-get_acs(geography = "block group", state = "NV",  #inputs from get_acs funtion
                    variables = msavars, year = 2019, geometry = TRUE)
     
@@ -113,9 +114,6 @@
         help(readOGR)
         trialogr<-readOGR(dsn = geodata, layer = "trial")
         
-        plot(trial, max.plot = 1) #better use ggplot2::geom_sf to facet and get a single legend
-        help(proj4string)
-        
         grid<-raster(extent(trial))
         res(grid)<-2
         
@@ -125,7 +123,7 @@
         
         gridpolygon<-rasterToPolygons(grid)
         
-        memory.size() ### Checking your memory size
+        memory.size() ### Checking memory size
         memory.limit(100000) ## Checking the set limit
         
 
@@ -189,7 +187,7 @@ help("st_area")
       
       
 
-# Intersect the Grid with the data of intereste for each cell -------------
+# Intersect the Grid with the data of interest for each cell -------------
 
       
 
