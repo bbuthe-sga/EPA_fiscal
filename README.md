@@ -19,9 +19,9 @@ EPA Smartlocation data - https://www.epa.gov/smartgrowth/smart-location-mapping
 
 # 02 PRELIM DATA CLEANING AND MANIPULATION
 
-1. Loaded the CBSA shapefile into GIS. Erased all water bodies and areas from the file. This includes areas that are area to be submerged and inundated area, but a spot check says those are all unpopulated anyway so it increases accuracy. 
+1. Loaded the CBSA shapefile into GIS. Erased all water bodies and areas from the file. This includes submerged and inundated areas, but a spot check says those are all unpopulated anyway so it increases accuracy. 
 2. Clipped all roads to the orignal complete CBSA file. This took about 30 or so minutes to complete. It was here that I noticed that the file is not great in terms of completeness for micropolitan areas, though the spot check I did on metro areas checked out more. 
-3. Loaded the parks shapefile into GIS and noticed that the NPS data seems like it may not actually cover all national parks, while the ESRI shapefile actually does great for state and local parks but for national parks it includes far too large of areas (look to CO for an example) where there are definitely populations living there. Need to find a better file or just use the ESRI one for all but national parks, and use the NPS file for national parks. 
+3. Loaded the parks shapefile into GIS and noticed that the NPS data seems like it may not actually cover all national parks, while the ESRI shapefile actually does great for regional, state and local parks but for national parks it includes far too large of areas (look to CO for an example) where there are definitely populations living there. Need to find a better file or just use the ESRI one for all but national parks, and use the NPS file for national parks. 
 4. 
 
 # 03 ANALYSIS
