@@ -35,24 +35,49 @@ attributes:
     - `county_loc` (central/outlying for the CBSA)
     - `population`
     - `jobs`
+    - `devlopable_acres` (developable area excluding water, protected area, etc.)
+    - `protected_acres` (area subjected to protections based on Protected Areas Dataset)
     - `act24` (24-hour activity)
-    - `road_area` (estimate of total roadway area)
+    - `dens24` (`act24` per `developable_acres`)
+    - `road_area` (estimate of total roadway area derived by summing fields from `CELLS_CBG`)
     - `infra_eff` (`road_area` per `act24`)
 
 - Block group-to-cells relationship (`CELLS_CBG`), including at least the
 following attributes:
     - `cell_id`
     - `geoid10` (12-digit block group id)
+    - `state_FIPS`
+    - `county_FIPS`
+    - `CBSA`
+    - `CBSA_type` (metropolitan/micropolitan)
+    - `county_loc` (central/outlying for the CBSA)
     - `area` (geometric area of overlap between cell and block group)
+    - `developable_acres` (developable area excluding water, protected area, etc.)
+    - `protected_acres` (area subjected to protections based on Protected Areas Dataset)
     - `cbg_area_shr` (`area` as a share of total block group area)
-    - `sf_res_suit_rd` (estimate of weighted roadway suitability for single family
-    residences)
-    - `other_suit_rd` (estimate of weighted roadway suitability for non-residential
-    and multifamily residences)
-    - `sf_res_suit_rd` (estimated of weighted land cover suitability for single family
+    - `sf_res_suit_lc` (estimated of weighted land cover suitability for single family
     residences)
     - `other_suit_lc` (estimated of weighted land cover suitability for non-residential
     and multifamily residences)
+    - Road area summaries (`X` in the field name indicates the FUNCTIONAL_CLASS of roads
+    overlapping this area)
+        - `ROAD_AREA_X` - The estimated total area of roads based on link width assumptions
+        and length intersecting ths area. Unpaved and private/non-publis access roads are
+        excluded from all road area estimates as are ferries of any kind.
+        - `BRIDGE_AREA_X` - The estimated area of roads that are bridges or tunnels. This
+        number is included in `ROAD_AREA_X`. This column can be used to net out bridges and
+        tunnels from the total estimated road area.
+        - `CTRL_AREA_X` - The estimated area of roads that are controlled/limited access
+        highways. This number if included in `ROAD_AREA_X`. This column can be used to net
+        out controlled access highways from the total estimated road area.
+        - `TOLL_AREA_X` - The estimated area of roads that are tollways. This number is
+        included in `ROAD_AREA_X`. This column can be used to net out tollways from the
+        total estimated road area. Most tollways are also controlled access highways. The
+        area of non-toll controlled access highways could usually be obtained by
+        subtracting `TOLL_AREA_X` from `CTRL_AREA_X`, but this may not be reliable in all
+        cases.
+        - `BOAT_LEN_X` - The total length of ferry links operating in this area. Ferries
+        are not reflected in `ROAD_AREA_X`. 
 
 These tables will allow the local area cells to be enriched with other
 attributes associated with block groups and CBSA's. The specific variables
@@ -71,27 +96,21 @@ attributes listed above are developed.
 
 - **Block groups**: To assign jobs, population, and other variables to each
 cell
-    - Boundary files: ...
+    - Boundary files: The Smart Location Database (SLD) features are used for this
+    analysis. https://www.epa.gov/smartgrowth/smart-location-mapping
     - Population in households vs. in group quarters: ACS 2019 5-year
     estimates Table B09019
     - Population by residential unit type: ACS 2019 5-year estimates
     Table B25033
-    - Jobs: LODES WAC tables (2018)
+    - Jobs: SLD (based on LODES WAC tables for 2018)
 
 - **Roads**: To summarize road area and road-based activity suitability to
 cells
-    - Option 1: ARNOLD - acquisition through FHWA by email request
+    Line files: HERE/NAVSTREETS - EPA license extends to contractors
         - All streets as features
-        - Number of lanes tabulated for HPMS, can generally assume 2 lanes
-        elsewhere
-    - Option 2: HERE/NAVSTREETS - EPA license extends to contractors
-        - All streets as features
-        - Number of lanes approximated in "lane category" fields
-    - Option 3: HPMS data -
-    https://www.bts.gov/geography/geospatial-portal/NTAD-direct-download
-        - Incomplete coverage in micro areas 
-        - More info on data found here: 
-        https://www.fhwa.dot.gov/policyinformation/hpms/shapefiles.cfm
+        - Number of lanes approximated in "lane category" fields on  per-direction basis.
+        - See `reclasses.xlsx` for details on how attributes are used to estimate
+        road width ("ROADS_LANES" tab) and summarize road area ("ROADS_ATTRIBUTES" tab).
 
 - **Land Cover**: To support allocation of jobs and population from block
 groups to cells
@@ -102,55 +121,42 @@ groups to cells
         - Single-family residents more likely in lower development intensities
         - Nominal suitability for activity in undeveloped land cover classes
         - No suitability for activity in inundated areas
-    - Water bodies and inundated areas (supplemental to NLCD)
-        - USGS NHDWaterbody and NHDArea (2 files) -
-        https://www.usgs.gov/core-science-systems/ngp/national-hydrography/access-national-hydrography-products
 
 - **Development Limitations**: To limit the amount of jobs and population
 estimated in protected areas
     - Protected Areas Dataset (PAD-US)
-    - National parks from NPS boundary file - 
-    https://public-nps.opendata.arcgis.com/datasets/nps::nps-boundary-1/about
-    - Local and regional parks from ESRI -
-    https://www.arcgis.com/home/item.html?id=578968f975774d3fab79fe56c8c90941
-    - Digital evelation models (to limit jobs and population estimated in
-    areas with steep slopes)
 
-- **Other Datasets**: To enrich the fiscal impact modeling process
-    - EPA Smart Location Database - 
-    https://www.epa.gov/smartgrowth/smart-location-mapping
+- **Other Datasets**: The SLD may be referenced to provide additional
+attributes to enrich the model estimation process.
 
 
 ## PROCESSING STEPS
 *TODO: add script references for each step/substep*
 
 ### 1. Data Acquisition
-- All source data are available from a shared data store, readable by code in
-this repository
+*(task_1_data_creation.py)*
+- All source data are available from a shared data store from which data
+can be downloaded to a local or network directory. The code in this repository
+allows the user to update the path to the `DATA` directory.
 - Raw data are stored in the RAW folder. Do not modify these datasets or save
 any processed data here.
 
 ### 2. Data Preparation
-- Generate local area cell features 
-    - Assign each cell's  `cell_id`, `state_FIPS`, `county_FIPS`,
-    `CBSA`, `CBSA_type`, `county_loc` attributes based on centroid location
-
+*(task_1_data_creation.py)*
 - Development suitability processing:
-    - Create two suitabiity surfaces - `sf_res_suit_lc` and `other_suit_lc`.
-    - Apply flags to features for filtering (which protected areas or
-    hydropgraphy features to exclude, e.g.)
-    - Calculate DEM slopes and set thesholds for screening.
     - Codify suitability rubrics
     (https://enviroatlas.epa.gov/enviroatlas/datafactsheets/pdf/Supplemental/Dasymetricallocationofpopulation.pdf).
-    - Reclass NLCD categories using suitability rubrics and screen out all
+    See `reclasses.xlsx` "NLCD" tab for suitability details.
+   - Apply flags to features for filtering (which protected areas to exclude, e.g.)
+   See `reclasses.xlsx` "PAD" tab for protected areas factoring details.
+    - Reclass NLCD categories using suitability rubrics and screen out/factor all
     unsuitable areas based on protections, inundation, etc.
+    - Create two suitability surfaces - `sf_res_suit_lc` and `other_suit_lc`.
 
 - Roads data:
-    - Create `road_area` field estimating road area based on linear distance,
-    number of lanes, estimated lane width, etc.
-    - Codify road suiatbility rubrics.
-    - Create `sf_res_suit_rd` and `other_suit_rd` fields based on `road_area`
-    and suitability rubrics.
+    - Codify lane count and width assumptions. See `reclasses.xlsx` "ROADS_LANES".
+    - Cofify road area summary gruopings. See `relcasses.xlsx` "ROADS_ATTRIBUTES".
+    - Calculate `link_area` based on linear distance, number of lanes, and estimated lane width.
 
 - CBSA data:
     - Tabulate CBSA population, jobs totals, density averages, etc.
@@ -163,8 +169,11 @@ any processed data here.
 - Configure all dataset and field references in the code
 
 ### 3. Intersect cells with block groups and roads
+*(task_1_data_creation.py)*
 This process is chunked to handle the large number of features implied by a
-national-scale analysis.
+national-scale analysis. Each CBSA is handled independently with the analysis
+iterating over each constituent county to limit the total quantity of features
+analyzed.
 
 - Find the spatial intersection of each cell with all overlapping block
 groups.
@@ -172,32 +181,55 @@ groups.
     - Tabulate the cumulative suitability from `sf_res_suit_lc` and
     `other_suit_lc`.
     - Find the spatial intersection with overlapping roads.
-    - Tabulate cumulative `road_area`, `sf_res_suit_rd`, and `other_suit_rd`
-    from overlapping roads.
-    - Combine `sf_res` and `other` suitability fields into composite scores,
-    `sf_res_suit`, `other_suit`
+    - Tabulate cumulative road areas from overlapping roads, summarizing by
+    attributes.
     - Write overlap feature records with key attributes to `CELLS_CBG`
 
 ### 4. Calculate cell shares of block group attributes
-- `area`
-- `sf_res_suit`
-- `other_suit`
+*(task_1_data_creation.py)*
+Calculate each cell/block group combination's share of total block group
+area and suitability (res and other). These will be used to facilitate
+disaggegation of block group-level data to the cell level.
 
 ### 5. Distribute block group level activities proportionally
-- Tabulate estimates in `LOC_CELLS`
+*(task_1_data_creation.py)*
+- Tabulate estimates for each cell/block group combination.
     - Population in single family homes by `sf_res_suit`
     - Other population by `other_suit`
-    - Jobs by `other_suit`
-    - `act24`
+    - `population` = single-family + other population
+    - `jobs` by `other_suit`
+    - `act24` is the sum of `jobs` and `population`.
+
+### 6. Summarize cell/block group combinations to cell level
+*(script TBD)*
+- Summarize `CELLS_CBG` records by `cell_id` to generate `LOC_CELLS` table.
+    - Assign each cell's  `cell_id`, `state_FIPS`, `county_FIPS`,
+    `CBSA`, `CBSA_type`, `county_loc` attributes based on the attribtes
+    associated with the block group having the largest overlap with
+    this cell.
+- Summarize `population`, `jobs`, `act24`
+- Summarize all road attributes
 
 ### 6. Summarize infrastructure efficiency
-- Tabulate estimates in `LOC_CELLS`
-    - `road_area`
-    - `infra_eff`
-
+*(script TBD)*
+- Tabulate estimates in `LOC_CELLS`.
+    - `road_area`: TBD - add/subtract column values reflecting different
+    road classes and subtypes (bridge/tunnel, e.g.) to get the total
+    relevant road area for regression purposes.
+    - `infra_eff`: `road_area` per `act24`
 
 ### 7. Enrich dataset with other attributes
+*(script TBD)*, applied as needed.
 - SLD attributes based on block groups in `CELLS_CBG`
     - Area-based averaging
     - Suitability-based averaging
 - CBSA-level attributes based cell column `CBSA`
+
+
+
+
+
+- Generate local area cell features 
+    - Assign each cell's  `cell_id`, `state_FIPS`, `county_FIPS`,
+    `CBSA`, `CBSA_type`, `county_loc` attributes based on maximum area of overlap
+    with census block features
