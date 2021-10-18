@@ -4,7 +4,7 @@ This document details the methods/inputs/outputs for the tool to calculate infra
 
 # 01 Inputs to create the tool
 
-1. Output data files detailed in default branch Readme of EPA_fiscal
+1. Output data files detailed in the "rp" branch Readme of EPA_fiscal
 2. Cost of infrastructure:  The cost of infrastructure at the per-unit level is indicated below.  For the most significant infrastructure cost - road costs, we use $25 / sq. ft. of road, which translates to roughly $3.1 mil. / lane mile for a two lane road, or $6.3 mil per lane-mile for a 4-lane road. These estimates are lower-end estimates from the American Road & Transportation Builders Association.  Costs for sidewalks, water mains, and sewer lines come from the experience of various fiscal impact studies conducted by Smart Growth America, and within range of values recommended by the State of Michigan.
       1. Road - $25/square foot 
       2. Sidewalk - $19/square foot
