@@ -48,6 +48,7 @@ The conversion factors we use are as follows:
 # 03 Output results
 
 Given the user inputs for Locations 1 and 2, the tool provides a collection of outputs for the user to consider. These include: 
+
       1. Infrastructure efficiency
       2. 24 hour population density (of entered block group ID)
       3. Road area
