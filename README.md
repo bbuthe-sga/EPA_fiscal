@@ -233,3 +233,25 @@ disaggegation of block group-level data to the cell level.
     - Assign each cell's  `cell_id`, `state_FIPS`, `county_FIPS`,
     `CBSA`, `CBSA_type`, `county_loc` attributes based on maximum area of overlap
     with census block features
+
+
+
+# Update:
+The initial analysis failed to account for bi-directionality of facilities when
+calculating lane miles. The original lane mile estiamtes were therefore updated
+to produce more reliable estimates. This, however, was not done by rerunning the
+entire process but by factoring the original lane mile estimates based on the
+typical proportion of facilities in each FUNCTIONAL CLASSIFICATION that allow
+bi-directional travel. For these facilities, the lane mileage needed to be
+increased by this proportion
+(i.e., `new lane miles = base line miles * (1 + share bi-drectional)`) for
+each facility type. The proportion of the facility miles expected to be
+bi-directional was based on national length-weighted averages for all
+facilities in a given functional class.
+
+Factors used to adjust lane mile estimates:
+0.087   FC1
+0.441   FC2
+0.757   FC3
+0.871   FC4
+0.986   FC5
